@@ -14,8 +14,21 @@ export default function IntegrationsPage() {
     setLoading(true);
     fetch(`${apiUrl}/integrations/sources`)
       .then((res) => res.json())
-      .then((data) => setSources(data || []))
-      .catch(() => setSources([]))
+      .then((data) => {
+        // Verificar si la respuesta es un array válido o un error
+        if (Array.isArray(data)) {
+          setSources(data);
+        } else if (data && data.statusCode) {
+          console.error('Error from API:', data.message);
+          setSources([]);
+        } else {
+          setSources(data || []);
+        }
+      })
+      .catch((error) => {
+        console.error('Network error:', error);
+        setSources([]);
+      })
       .finally(() => setLoading(false));
   }, [apiUrl, creating]);
 
@@ -23,8 +36,21 @@ export default function IntegrationsPage() {
     setConnectorLoading(true);
     fetch(`${apiUrl}/integrations/connectors?industry=saas`)
       .then((res) => res.json())
-      .then((data) => setConnectors(data || []))
-      .catch(() => setConnectors([]))
+      .then((data) => {
+        // Verificar si la respuesta es un array válido o un error
+        if (Array.isArray(data)) {
+          setConnectors(data);
+        } else if (data && data.statusCode) {
+          console.error('Error from API:', data.message);
+          setConnectors([]);
+        } else {
+          setConnectors(data || []);
+        }
+      })
+      .catch((error) => {
+        console.error('Network error:', error);
+        setConnectors([]);
+      })
       .finally(() => setConnectorLoading(false));
   }, [apiUrl]);
 
