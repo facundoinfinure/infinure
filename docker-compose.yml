@@ -1,0 +1,81 @@
+services:
+  db:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: infinure
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@db:5432/infinure
+      JWT_SECRET: supersecret
+      NODE_ENV: development
+      REDIS_URL: redis://redis:6379
+      FRONTEND_URL: http://localhost:3001
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./backend:/usr/src/app
+      - /usr/src/app/node_modules
+      - /usr/src/app/dist
+    depends_on:
+      - db
+      - redis
+
+  frontend:
+    build: ./frontend
+    restart: unless-stopped
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:3000/api
+      NEXT_PUBLIC_INTEGRATIONS_API_URL: http://localhost:3002
+    ports:
+      - "3001:3000"
+    volumes:
+      - ./frontend:/usr/src/app
+      - /usr/src/app/node_modules
+      - /usr/src/app/.next
+    depends_on:
+      - backend
+
+  # airbyte:
+  #   image: airbyte/airbyte:oss
+  #   restart: unless-stopped
+  #   ports:
+  #     - "8000:8000"
+  #   volumes:
+  #     - airbyte_data:/data
+
+  # integration-service:
+  #   build: ./integration-service
+  #   restart: unless-stopped
+  #   environment:
+  #     AIRBYTE_API_URL: http://airbyte:8000/api
+  #   ports:
+  #     - "3002:3000"
+  #   volumes:
+  #     - ./integration-service:/usr/src/app
+  #     - /usr/src/app/node_modules
+  #   depends_on:
+  #     - airbyte
+  #     - redis
+
+volumes:
+  postgres_data:
+  redis_data:
+  # airbyte_data: 

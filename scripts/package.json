@@ -1,0 +1,17 @@
+{
+  "name": "scripts",
+  "version": "1.0.0",
+  "description": "Scripts de utilidad para la plataforma Infinure.",
+  "main": "seed-admin-user.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "pg": "^8.16.0"
+  }
+}
